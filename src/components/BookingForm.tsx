@@ -118,15 +118,15 @@ const getTimeSlots = (date: Date | null, bookedSlots: string[]) => {
   const slots = getAppointmentTimes(date);
 
   return slots.map((value) => {
-      const isBooked = Boolean(dateIso && bookedSlots.includes(getSlotKey(dateIso, value)));
+    const isBooked = Boolean(dateIso && bookedSlots.includes(getSlotKey(dateIso, value)));
 
-      return {
-        value,
-        label: formatTimeLabel(value),
-        isAvailable: !isBooked,
-        isBooked,
-      };
-    });
+    return {
+      value,
+      label: formatTimeLabel(value),
+      isAvailable: !isBooked,
+      isBooked,
+    };
+  });
 };
 
 function BookingForm({ t, services }: BookingFormProps) {
@@ -357,7 +357,14 @@ function BookingForm({ t, services }: BookingFormProps) {
                   disabled={!slot.isAvailable || !form.date}
                   aria-pressed={form.time === slot.value}
                 >
-                  {slot.label}
+                  <span className="time-slot-main">
+                    <span className="time-slot-icon" aria-hidden="true" />
+                    <span>{slot.label}</span>
+                  </span>
+                  <span className="time-slot-status">
+                    <span aria-hidden="true">{slot.isAvailable ? '✓' : '×'}</span>
+                    {slot.isAvailable ? t.available : t.unavailable}
+                  </span>
                 </button>
               ))}
             </div>

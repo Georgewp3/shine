@@ -804,28 +804,78 @@ textarea:focus {
 
 .time-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 8px;
-  max-height: 260px;
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  padding-right: 4px;
+  grid-template-columns: 1fr;
+  gap: 10px;
 }
 
 .time-slot {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
   border-color: rgba(255, 255, 255, 0.1);
-  background: rgba(255, 255, 255, 0.04);
-  min-height: 42px;
-  border-radius: 999px;
-  padding: 0 10px;
-  font-size: 0.9rem;
+  background: rgba(255, 255, 255, 0.035);
+  min-height: 58px;
+  border-radius: 12px;
+  padding: 0 16px;
+  color: var(--text);
+  font-size: 1rem;
   font-weight: 900;
+  text-align: left;
 }
 
 .time-slot.is-available {
   color: var(--text);
   border-color: rgba(33, 223, 255, 0.45);
   background: rgba(33, 223, 255, 0.1);
+}
+
+.time-slot-main,
+.time-slot-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.time-slot-icon {
+  width: 22px;
+  height: 22px;
+  position: relative;
+  flex: 0 0 22px;
+  border: 2px solid #718096;
+  border-radius: 50%;
+}
+
+.time-slot-icon::before,
+.time-slot-icon::after {
+  content: "";
+  position: absolute;
+  left: 9px;
+  bottom: 9px;
+  width: 2px;
+  border-radius: 999px;
+  background: #718096;
+  transform-origin: bottom center;
+}
+
+.time-slot-icon::before {
+  height: 6px;
+}
+
+.time-slot-icon::after {
+  height: 5px;
+  transform: rotate(90deg);
+}
+
+.time-slot-status {
+  color: #20d46a;
+  font-size: 0.92rem;
+}
+
+.time-slot.is-unavailable .time-slot-status,
+.time-slot.is-booked .time-slot-status {
+  color: #e34444;
 }
 
 .form-message {
@@ -1128,15 +1178,10 @@ textarea:focus {
     font-size: 0.86rem;
   }
 
-  .time-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    max-height: none;
-  }
-
   .time-slot {
-    min-height: 44px;
+    min-height: 58px;
     border-radius: 12px;
-    font-size: 0.86rem;
+    font-size: 0.94rem;
     white-space: normal;
   }
 
