@@ -50,8 +50,6 @@ const startOfMonth = (date: Date) => new Date(date.getFullYear(), date.getMonth(
 const addMonths = (date: Date, amount: number) =>
   new Date(date.getFullYear(), date.getMonth() + amount, 1);
 
-const minutesToTime = (minutes: number) => `${pad(Math.floor(minutes / 60))}:${pad(minutes % 60)}`;
-
 const formatTimeLabel = (value: string) => {
   const [hourValue, minute] = value.split(':').map(Number);
   const suffix = hourValue >= 12 ? 'PM' : 'AM';
@@ -97,25 +95,35 @@ const getWorkingWindow = (date: Date) => {
   return null;
 };
 
-const getTimeSlots = (date: Date | null, bookedSlots: string[]) => {
-  const workingWindow = date ? getWorkingWindow(date) : null;
-  const dateIso = date ? toIsoDate(date) : '';
-  const baseSlots = Array.from({ length: 23 }, (_, index) => 9 * 60 + index * 30);
-  const slots = workingWindow ? [...baseSlots, workingWindow.start] : baseSlots;
+const getAppointmentTimes = (date: Date | null) => {
+  if (!date) {
+    return [];
+  }
 
-  return Array.from(new Set(slots))
-    .sort((first, second) => first - second)
-    .map((minutes) => {
-      const value = minutesToTime(minutes);
+  const day = date.getDay();
+
+  if (day >= 2 && day <= 5) {
+    return ['14:15', '16:15', '18:15'];
+  }
+
+  if (day === 6) {
+    return ['09:00', '11:00', '13:00', '15:00'];
+  }
+
+  return [];
+};
+
+const getTimeSlots = (date: Date | null, bookedSlots: string[]) => {
+  const dateIso = date ? toIsoDate(date) : '';
+  const slots = getAppointmentTimes(date);
+
+  return slots.map((value) => {
       const isBooked = Boolean(dateIso && bookedSlots.includes(getSlotKey(dateIso, value)));
-      const isInWorkingWindow = Boolean(
-        workingWindow && minutes >= workingWindow.start && minutes < workingWindow.end,
-      );
 
       return {
         value,
         label: formatTimeLabel(value),
-        isAvailable: isInWorkingWindow && !isBooked,
+        isAvailable: !isBooked,
         isBooked,
       };
     });
