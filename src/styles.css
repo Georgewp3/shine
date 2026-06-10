@@ -1,4 +1,4 @@
-:root {
+﻿:root {
   --bg: #05090f;
   --bg-soft: #081522;
   --card: #0b1827;
@@ -506,6 +506,68 @@ img {
   color: #ff4646;
 }
 
+.service-area {
+  background: #000;
+  padding-top: 76px;
+}
+
+.service-area-heading {
+  text-align: center;
+  margin-bottom: 46px;
+}
+
+.service-area-heading h2 {
+  text-transform: uppercase;
+  letter-spacing: 0;
+}
+
+.service-area-heading h2 span {
+  color: var(--cyan);
+  text-shadow: 0 0 18px rgba(33, 223, 255, 0.72);
+}
+
+.service-area-heading p {
+  margin: 26px auto 0;
+  color: #c5cdd3;
+  font-size: 1.08rem;
+}
+
+.service-map {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  height: clamp(320px, 36vw, 460px);
+  border: 2px solid rgba(33, 223, 255, 0.46);
+  border-radius: 12px;
+  background: #10161b;
+}
+
+.service-map iframe {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+.map-open-link {
+  position: absolute;
+  z-index: 2;
+  top: 10px;
+  left: 10px;
+  padding: 10px 13px;
+  border-radius: 2px;
+  background: #fff;
+  color: #006ee6;
+  font-size: 0.88rem;
+  font-weight: 800;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.28);
+}
+
+.map-open-link::after {
+  content: '>';
+  margin-left: 6px;
+  font-size: 0.78rem;
+}
 .booking-layout {
   max-width: 980px;
   display: grid;
@@ -1309,3 +1371,5 @@ textarea:focus {
     margin-bottom: 8px;
   }
 }
+
+
