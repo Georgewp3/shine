@@ -873,6 +873,20 @@ textarea:focus {
   font-size: 0.92rem;
 }
 
+.time-slot-status span[aria-hidden='true'] {
+  font-size: 0;
+}
+
+.time-slot-status span[aria-hidden='true']::before {
+  content: '+';
+  font-size: 0.92rem;
+}
+
+.time-slot.is-unavailable .time-slot-status span[aria-hidden='true']::before,
+.time-slot.is-booked .time-slot-status span[aria-hidden='true']::before {
+  content: 'x';
+}
+
 .time-slot.is-unavailable .time-slot-status,
 .time-slot.is-booked .time-slot-status {
   color: #e34444;

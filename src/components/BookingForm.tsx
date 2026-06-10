@@ -1,4 +1,4 @@
-import { FormEvent, useMemo, useState } from 'react';
+import { FormEvent, useEffect, useMemo, useState } from 'react';
 import logo from '../assets/logo.webp';
 import { ServiceText, Translation } from '../data/translations';
 
@@ -29,7 +29,7 @@ const initialState: BookingState = {
   message: '',
 };
 
-const bookedSlotsStorageKey = 'shine-argyrou-booked-slots';
+const apiBaseUrl = import.meta.env.VITE_API_URL?.replace(/\/$/, '') || '';
 
 type BookingFormProps = {
   t: Translation['booking'];
@@ -59,27 +59,62 @@ const formatTimeLabel = (value: string) => {
 
 const getSlotKey = (date: string, time: string) => `${date}T${time}`;
 
-const loadBookedSlots = () => {
-  if (typeof window === 'undefined') {
-    return [];
+const normalizeBookedSlots = (slots: unknown) =>
+  Array.isArray(slots) ? slots.filter((slot): slot is string => typeof slot === 'string') : [];
+
+const fetchBookedSlots = async () => {
+  if (!apiBaseUrl) {
+    throw new Error('Booking API is not configured.');
   }
 
-  try {
-    const storedSlots = window.localStorage.getItem(bookedSlotsStorageKey);
-    const parsedSlots = storedSlots ? JSON.parse(storedSlots) : [];
-    return Array.isArray(parsedSlots) ? parsedSlots.filter((slot) => typeof slot === 'string') : [];
-  } catch {
-    return [];
+  const response = await fetch(`${apiBaseUrl}/api/booked-slots`);
+
+  if (!response.ok) {
+    throw new Error('Failed to fetch booked slots.');
   }
+
+  const data = await response.json();
+  return normalizeBookedSlots(data.slots);
 };
 
-const saveBookedSlots = (slots: string[]) => {
-  try {
-    window.localStorage.setItem(bookedSlotsStorageKey, JSON.stringify(slots));
-  } catch {
-    // localStorage can be unavailable in private browsing or restricted webviews.
+const createBooking = async (booking: BookingState) => {
+  if (!apiBaseUrl) {
+    throw new Error('Booking API is not configured.');
   }
+
+  const response = await fetch(`${apiBaseUrl}/api/bookings`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      date: booking.date,
+      time: booking.time,
+      name: booking.name,
+      phone: booking.phone,
+      service: booking.service,
+      message: booking.message,
+    }),
+  });
+
+  const data = await response.json().catch(() => ({}));
+
+  if (response.status === 409) {
+    const slotKey = getSlotKey(booking.date, booking.time);
+    const slots = normalizeBookedSlots(data.slots);
+    const latestSlots = slots.length > 0 ? slots : await fetchBookedSlots().catch(() => [slotKey]);
+
+    return { ok: false, conflict: true, slots: latestSlots };
+  }
+
+  if (!response.ok) {
+    throw new Error('Failed to create booking.');
+  }
+
+  return { ok: true, conflict: false, slots: normalizeBookedSlots(data.slots) };
 };
+
+type BookingResult = Awaited<ReturnType<typeof createBooking>>;
 
 const getWorkingWindow = (date: Date) => {
   const day = date.getDay();
@@ -133,8 +168,55 @@ function BookingForm({ t, services }: BookingFormProps) {
   const [form, setForm] = useState<BookingState>(initialState);
   const [feedback, setFeedback] = useState('');
   const [error, setError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [visibleMonth, setVisibleMonth] = useState(() => startOfMonth(new Date()));
-  const [bookedSlots, setBookedSlots] = useState<string[]>(loadBookedSlots);
+  const [bookedSlots, setBookedSlots] = useState<string[]>([]);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    if (!apiBaseUrl) {
+      setError('Booking API is not configured.');
+      return () => {
+        isMounted = false;
+      };
+    }
+
+    fetchBookedSlots()
+      .then((slots) => {
+        if (isMounted) {
+          setBookedSlots(slots);
+        }
+      })
+      .catch(() => {
+        if (isMounted) {
+          setError('Booking API is not configured.');
+        }
+      });
+
+    const events = new EventSource(`${apiBaseUrl}/api/booked-slots/events`);
+
+    events.onmessage = (event) => {
+      try {
+        const data = JSON.parse(event.data);
+
+        if (isMounted) {
+          setBookedSlots(normalizeBookedSlots(data.slots));
+        }
+      } catch {
+        // Ignore malformed live updates and keep the last known slot list.
+      }
+    };
+
+    events.onerror = () => {
+      events.close();
+    };
+
+    return () => {
+      isMounted = false;
+      events.close();
+    };
+  }, []);
 
   const today = useMemo(() => startOfDay(new Date()), []);
   const selectedDate = form.date ? startOfDay(new Date(`${form.date}T00:00:00`)) : null;
@@ -198,10 +280,15 @@ function BookingForm({ t, services }: BookingFormProps) {
     setError('');
   };
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setError('');
     setFeedback('');
+
+    if (!apiBaseUrl) {
+      setError('Booking API is not configured.');
+      return;
+    }
 
     if (!form.name || !form.phone || !form.service || !form.date || !form.time) {
       setError(t.error);
@@ -211,7 +298,27 @@ function BookingForm({ t, services }: BookingFormProps) {
     const slotKey = getSlotKey(form.date, form.time);
 
     if (bookedSlots.includes(slotKey)) {
-      setError(t.error);
+      setError(`${t.time} ${t.unavailable}.`);
+      setForm((current) => ({ ...current, time: '' }));
+      return;
+    }
+
+    let bookingResult: BookingResult;
+
+    try {
+      setIsSubmitting(true);
+      bookingResult = await createBooking(form);
+    } catch {
+      setError(apiBaseUrl ? t.error : 'Booking API is not configured.');
+      setIsSubmitting(false);
+      return;
+    }
+
+    setIsSubmitting(false);
+
+    if (!bookingResult.ok) {
+      setBookedSlots(bookingResult.slots);
+      setError('This date and time is already booked. Please choose another slot.');
       setForm((current) => ({ ...current, time: '' }));
       return;
     }
@@ -221,9 +328,7 @@ function BookingForm({ t, services }: BookingFormProps) {
       time: formatTimeLabel(form.time),
     });
 
-    const nextBookedSlots = [...bookedSlots, slotKey];
-    setBookedSlots(nextBookedSlots);
-    saveBookedSlots(nextBookedSlots);
+    setBookedSlots((current) => [...new Set([...current, slotKey])]);
     setForm((current) => ({ ...current, date: '', time: '' }));
     setFeedback(t.success);
     window.open(`https://wa.me/35799668535?text=${encodeURIComponent(text)}`, '_blank', 'noopener');
@@ -380,8 +485,8 @@ function BookingForm({ t, services }: BookingFormProps) {
           </label>
           {error && <p className="form-message error">{error}</p>}
           {feedback && <p className="form-message success">{feedback}</p>}
-          <button className="button button-primary" type="submit">
-            {t.submit}
+          <button className="button button-primary" type="submit" disabled={isSubmitting}>
+            {isSubmitting ? 'Booking...' : t.submit}
           </button>
           <p className="booking-note">{t.note}</p>
         </form>
