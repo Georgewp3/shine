@@ -1,50 +1,52 @@
-﻿type ServiceAreaProps = {
-  area: {
-    title: string;
-    text: string;
-  };
-};
+﻿// ServiceArea.tsx
+import "./ServiceArea.css";
 
-const mapsUrl = 'https://www.google.com/maps/search/?api=1&query=Larnaca%2C%20Oroklini%2C%20Kiti%2C%20Cyprus';
-const embedUrl = 'https://www.google.com/maps?q=34.905%2C33.620&z=12&output=embed';
-
-function ServiceArea({ area }: ServiceAreaProps) {
-  const titleParts = area.title.split(' ');
-  const accentWord = titleParts.pop();
-  const titleStart = titleParts.join(' ');
-
+export default function ServiceArea() {
   return (
-    <section className="section service-area" id="area" aria-labelledby="area-title">
-      <div className="container">
-        <div className="service-area-heading">
-          <h2 id="area-title">
-            {titleStart} <span>{accentWord}</span>
-          </h2>
-          <p>{area.text}</p>
-        </div>
-        <div className="service-map">
-          <a className="map-open-link" href={mapsUrl} target="_blank" rel="noreferrer">
-            Open in Maps
-          </a>
+    <section id="service-area" className="service-area">
+      <div className="service-area__inner">
+        <header className="service-area__header">
+          <h2>Our Service Area</h2>
+          <p>We proudly serve Larnaca and the surrounding areas in Cyprus.</p>
+        </header>
+
+        <div className="service-area__map-card">
+          <div className="service-area__map-label">
+            <div className="service-area__map-label-text">
+              <strong>Larnaca</strong>
+              <span>Larnaca, Cyprus</span>
+            </div>
+            <div className="service-area__map-label-actions">
+              <a
+                href="https://www.google.com/maps/place/Larnaca,+Cyprus"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Open in Google Maps"
+                className="service-area__icon-btn"
+              >
+                ↗
+              </a>
+              <a
+                href="https://www.google.com/maps/dir/?api=1&destination=Larnaca,Cyprus"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Get directions"
+                className="service-area__icon-btn service-area__icon-btn--primary"
+              >
+                ➤
+              </a>
+            </div>
+          </div>
+
           <iframe
-            title="Google map showing Larnaca, Kiti and Oroklini service area"
-            src={embedUrl}
+            title="Larnaca service area map"
+            src="https://www.google.com/maps?q=Larnaca,Cyprus&z=11&output=embed"
             loading="lazy"
             referrerPolicy="no-referrer-when-downgrade"
             allowFullScreen
           />
-          <svg
-            className="service-area-outline"
-            viewBox="0 0 1000 460"
-            preserveAspectRatio="none"
-            aria-hidden="true"
-          >
-            <path d="M 573 8 C 604 38 604 88 636 113 C 676 145 738 132 770 169 C 801 207 771 254 722 268 C 666 284 671 333 704 363 C 724 383 713 418 681 435 C 641 455 592 432 557 392 C 523 354 478 356 451 393 C 418 438 342 426 311 378 C 282 334 302 292 350 264 C 392 240 388 202 344 178 C 295 151 235 161 212 127 C 190 94 233 58 287 74 C 349 92 401 76 438 38 C 478 -2 535 -25 573 8 Z" />
-          </svg>
         </div>
       </div>
     </section>
   );
 }
-
-export default ServiceArea;

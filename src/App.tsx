@@ -29,7 +29,7 @@ function App() {
         <Services t={t.services} />
         <Schedule t={t.schedule} />
         <BookingForm t={t.booking} services={t.services.items} />
-        <ServiceArea area={t.area} />
+        <ServiceArea />
         <Contact t={t.contact} />
       </main>
       <Footer t={t.footer} />
@@ -38,4 +38,5 @@ function App() {
 }
 
 export default App;
+
 
