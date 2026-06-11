@@ -1,27 +1,32 @@
-﻿// ServiceArea.tsx
-import "./ServiceArea.css";
+import type { Translation } from '../data/translations';
+import './ServiceArea.css';
 
-export default function ServiceArea() {
+type ServiceAreaProps = {
+  t: Translation['area'];
+};
+
+export default function ServiceArea({ t }: ServiceAreaProps) {
   return (
     <section id="service-area" className="service-area">
       <div className="service-area__inner">
         <header className="service-area__header">
-          <h2>Our Service Area</h2>
-          <p>We proudly serve Larnaca and the surrounding areas in Cyprus.</p>
+          <span className="section-eyebrow">{t.eyebrow}</span>
+          <h2>{t.title}</h2>
+          <p>{t.text}</p>
         </header>
 
         <div className="service-area__map-card">
           <div className="service-area__map-label">
             <div className="service-area__map-label-text">
-              <strong>Larnaca</strong>
-              <span>Larnaca, Cyprus</span>
+              <strong>{t.mapTitle}</strong>
+              <span>{t.mapLocation}</span>
             </div>
             <div className="service-area__map-label-actions">
               <a
                 href="https://www.google.com/maps/place/Larnaca,+Cyprus"
                 target="_blank"
                 rel="noopener noreferrer"
-                aria-label="Open in Google Maps"
+                aria-label={t.openMap}
                 className="service-area__icon-btn"
               >
                 ↗
@@ -30,7 +35,7 @@ export default function ServiceArea() {
                 href="https://www.google.com/maps/dir/?api=1&destination=Larnaca,Cyprus"
                 target="_blank"
                 rel="noopener noreferrer"
-                aria-label="Get directions"
+                aria-label={t.getDirections}
                 className="service-area__icon-btn service-area__icon-btn--primary"
               >
                 ➤
@@ -39,7 +44,7 @@ export default function ServiceArea() {
           </div>
 
           <iframe
-            title="Larnaca service area map"
+            title={t.mapLocation}
             src="https://www.google.com/maps?q=Larnaca,Cyprus&z=11&output=embed"
             loading="lazy"
             referrerPolicy="no-referrer-when-downgrade"

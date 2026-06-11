@@ -90,6 +90,10 @@ export type Translation = {
     eyebrow: string;
     title: string;
     text: string;
+    mapTitle: string;
+    mapLocation: string;
+    openMap: string;
+    getDirections: string;
   };
   contact: {
     eyebrow: string;
@@ -236,8 +240,12 @@ Notes: ${message || 'None'}`,
     },
     area: {
       eyebrow: 'Where we work',
-      title: 'Service Area',
-      text: 'Proudly serving Larnaca, Kiti and Oroklini.',
+      title: 'Our Service Area',
+      text: 'We proudly serve Larnaca and the surrounding areas in Cyprus.',
+      mapTitle: 'Larnaca',
+      mapLocation: 'Larnaca, Cyprus',
+      openMap: 'Open in Google Maps',
+      getDirections: 'Get directions',
     },
     contact: {
       eyebrow: 'Contact',
@@ -383,7 +391,11 @@ Notes: ${message || 'None'}`,
     area: {
       eyebrow: 'Περιοχές εξυπηρέτησης',
       title: 'Περιοχή Εξυπηρέτησης',
-      text: 'Εξυπηρετούμε με υπερηφάνεια τη Λάρνακα, το Κίτι και την Ορόκλινη.',
+      text: 'Εξυπηρετούμε με υπερηφάνεια τη Λάρνακα και τις γύρω περιοχές της Κύπρου.',
+      mapTitle: 'Λάρνακα',
+      mapLocation: 'Λάρνακα, Κύπρος',
+      openMap: 'Άνοιγμα στους Χάρτες Google',
+      getDirections: 'Λήψη οδηγιών',
     },
     contact: {
       eyebrow: 'Επικοινωνία',
