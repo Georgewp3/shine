@@ -45,9 +45,9 @@ export default function ServiceArea({ t }: ServiceAreaProps) {
 
           <iframe
             title={t.mapLocation}
-            src="https://www.openstreetmap.org/export/embed.html?bbox=33.47%2C34.80%2C33.77%2C35.04&layer=mapnik&marker=34.9182%2C33.6201"
+            src="https://www.google.com/maps?q=Larnaca,Cyprus&z=11&output=embed"
             loading="lazy"
-            referrerPolicy="no-referrer"
+            referrerPolicy="no-referrer-when-downgrade"
             allowFullScreen
           />
         </div>
