@@ -1,6 +1,6 @@
 ﻿.service-area {
   padding: 80px 20px;
-  background: #f7f9fc;
+  background: #000;
 }
 
 .service-area__inner {
@@ -16,12 +16,12 @@
 .service-area__header h2 {
   font-size: 2.25rem;
   font-weight: 700;
-  color: #0f172a;
+  color: #f4fbff;
   margin: 0 0 10px;
 }
 
 .service-area__header p {
-  color: #475569;
+  color: #a9bed0;
   font-size: 1.05rem;
   margin: 0;
 }
@@ -66,7 +66,7 @@
 
 .service-area__map-label-text strong {
   font-size: 1rem;
-  color: #0f172a;
+  color: #f4fbff;
 }
 
 .service-area__map-label-text span {
@@ -107,3 +107,4 @@
   .service-area__map-card { aspect-ratio: 4 / 5; }
   .service-area__map-label { min-width: 0; right: 16px; }
 }
+
